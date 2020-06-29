@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="//code.jquery.com/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
+    integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" rel="stylesheet"/>
+    <script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+    <link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+
+    <link rel="shortcut icon" href="#">
+    <!-- favicon err 방지 -->
+    <title>섹션 데이터 보존</title>
+
+
+
+      <%  var formComponents=JSON.parse(json) %>
+
+      <%
+
+        var sectionCount = 0 // 전체 페이지 개수
+        // 0 페이지부터 편의상 시작
+        var CursectionIndex = parseInt(page) // 현재 페이지 인덱스,string 으로 왔었다니 오우쒯!
+        var PresectionIndex = CursectionIndex-1 // previous page index
+        var Islastpage = false
+        var Isfirstpage = true
+        var iterCount = 0 // 현재 페이지 까지의 설문항목 개수
+        var eachPageitemCount = 0 // 각 페이지의 항목 개수
+        var mapPage = new Map()
+
+      %>
+      <%#
+        //console.log("main head - formComponents = ", formComponents)
+        if(formComponents === null){
+          console.log("main head - formComponents is null")
+        }else{
+          console.log("main head - formComponents.length = ", formComponents.length)
+        }
+
+      %>
+</head>
+
+<%
+  function test_seccount() {
+//console.log("function test_seccount - called ")
+if(formComponents !== null){
+for(var i=0;i<formComponents.length;i++){
+  var mType=formComponents[i].type
+  if(mType==10){
+    mapPage.set(sectionCount,eachPageitemCount)
+    sectionCount++
+    eachPageitemCount=0
+  } else {
+    eachPageitemCount++
+    if(i==formComponents.length-1){
+      mapPage.set(sectionCount,eachPageitemCount)
+    }
+  }
+}
+}
+console.log("function test_seccount - sectionCount=",sectionCount)
+console.log(" function test_seccount - mapPage=",mapPage)
+}   // test_seccount 끝
+%>
+
+
+    <%
+    // 개수파악, 함수호출
+    test_seccount()
+    %>
+
+    <%
+      function test_logia(iterfrom,iterend) {
+        console.log("function test_logia 1 - iterfrom = ", iterfrom)
+        console.log("function test_logia 1 - iterend = ", iterend)
+    %>
+    <% if(formComponents !== null){ %>
+    <%#  for(var i=iterfrom;i<formComponents.length;i++){ %>
+    <%  for(var i=0;i<formComponents.length;i++){ %>
+    <%    var mType=formComponents[i].type %>
+
+    <% if(mType==0){ %>
+
+    <% if(iterfrom<=i && i<iterend){ %>
+        <div id="type0" >
+          <div class="form-group" style="border :2px solid #00BFFF; border-radius:20px; padding: 15px; background-color: #ffffff;">
+            <label name='title'><%= formComponents[i].question  %></label>
+            <input type="text" class="form-control" name=<%=i %> placeholder="한 줄입력">
+          </div>
+        </div>
+    <% } else { %>
+      <!-- 출력은 하되 보이지 말라 -->
+      <div id="type0" style="visibility:hidden">
+        <div class="form-group" style="border :2px solid #00BFFF; border-radius:20px; padding: 15px; background-color: #ffffff;">
+          <label name='title'><%= formComponents[i].question  %></label>
+          <input type="text" class="form-control" name=<%=i %> placeholder="한 줄입력">
+        </div>
+      </div>
+    <% } %>
+
+
+      <% } else if(mType==10){%>
+
+
+        <% if(iterfrom<=i && i<iterend){ %>
+
+          <%
+
+          if(CursectionIndex == sectionCount){ // last page
+              console.log("function test_logia - 막페이지 :",i)
+              Islastpage = true;
+
+          }else if(0 < CursectionIndex && CursectionIndex < sectionCount){ // 중간페이지
+              console.log("function test_logia - 중간페이지 :",i)
+              Isfirstpage = false //여기서 false 로 변경해주고
+
+              if(i == iterCount + mapPage.get(CursectionIndex) + 1){ // stop 해줘야함. 다음,마지막페이지 출력방지
+                  console.log("function test_logia 중간 - stop = ",iterCount + mapPage.get(CursectionIndex)+1)
+                  iterCount = i
+                  //CursectionIndex++
+              }
+
+          }else if(CursectionIndex == 0 ){ // 첫 페이지
+            console.log("function test_logia - 첫페이지 :",i)
+            //CursectionIndex++
+          }
+          %>
+
+
+
+            <div class="form-group" style="border :2px solid #00BFFF;border-radius: 20px;padding: 15px; background:#2c81e2">
+                <div>
+                    <label style="color: aliceblue"><%= formComponents[i].question  %></label>
+                </div>
+                <div>
+                    <label style="color: aliceblue"><%= formComponents[i].description  %></label>
+                </div>
+            </div>
+            <% } else { %>
+              <div class="form-group" style="border :2px solid #00BFFF;border-radius: 20px;padding: 15px; background:#2c81e2; visibility:hidden">
+                <!-- visibility:hidden -->
+                <!-- display:none -->
+                  <div>
+                      <label style="color: aliceblue"><%= formComponents[i].question  %></label>
+                  </div>
+                  <div>
+                      <label style="color: aliceblue"><%= formComponents[i].description  %></label>
+                  </div>
+              </div>
+            <% } %>
+
+
+
+
+
+        <% } %> <!-- else if(mType==10) 끝 -->
+
+          <% } %> <!-- 폼 for loop 끝 -->
+      <% } %><!-- if(formComponents !== null) 끝 -->
+
+
+      <%
+//console.log("function test_logia 후- CursectionIndex =",CursectionIndex)
+      }   // logia 끝
+      %>
+
+
+
+
+
+
+
+
+
+
+
+
+    <body>
+
+        <div class="container" >
+
+            <div id="typeHead" style="border-top:10px groove #4169E1; padding: 10px; margin-bottom:10px; background-color: #ffffff;">
+              <div><h1><%= title  %></h1></div>
+              <div><h5><%= description  %></h3></div>
+            </div>
+
+              <form action='/result' id='result' method='post'>
+                  <div style="display:none">
+                      <input type="text" class="form-control" name="form_id" value="<%=form_id%>">
+                      <input type="text" class="form-control" name="userEmail" value="<%=user_email%>">
+                  </div>
+
+
+<%#
+console.log("첫 iterCount = ",iterCount)
+
+for(var k=0;k<mapPage.size;k++){
+console.log("mapPage get ",k," = ",mapPage.get(k))
+
+if(k ==0){ // 아 처음 default header가 복잡하게 하네
+iterCount += mapPage.get(k)
+}else{
+// section header 포함,1
+iterCount += mapPage.get(k)+1
+}
+}
+
+console.log("후 iterCount = ",iterCount)
+%>
+<% // 필요부분
+//console.log("첫2 iterCount = ",iterCount)
+for(var k=0;k<CursectionIndex;k++){
+  console.log("2 mapPage get ",k," = ",mapPage.get(k))
+  if(k ==0){
+    iterCount += mapPage.get(k)
+  }else{
+    // section header 포함,1
+    iterCount += mapPage.get(k)+1
+  }
+}
+console.log("후2 iterCount = ",iterCount)
+%>
+                  <%
+                  console.log("CursectionIndex = ",CursectionIndex)
+                  console.log("PresectionIndex = ",PresectionIndex)
+
+                if(page==0){
+                  //test_logia(0)
+                  test_logia(0,mapPage.get(0)) // 시작,끝
+                }else{
+                  // 이전 설문항목들 다 합한 값
+                    test_logia(iterCount,iterCount+mapPage.get(CursectionIndex)+1)
+                }
+
+
+                  %>
+                  <%
+                  console.log("mapPage.size = ",mapPage.size)
+                  // if로 제한걸 필요없다. 어차피 제출버튼이 보이고,다음버튼이 안보일테니까
+                  CursectionIndex++
+                  %>
+
+            </form>
+
+            <%
+            if(Islastpage == true){
+            %>
+                   <div  style="display:inline">
+                     <button type="button" class="btn btn-info previouspage">이전</button>
+                   </div>
+                  <div id='divsubmit' style="display:inline">
+                    <button type="button" class="btn btn-primary" id='submit'>제출하기</button>
+                  </div>
+          <%  } else if (Islastpage == false && Isfirstpage == false){  %>
+<!-- } else if (!Islastpage && !Isfirstpage){ -->
+                  <div  style="display:inline">
+                    <button type="button" class="btn btn-info previouspage" >이전</button>
+                  </div>
+                 <div id='divsubmit' style="display:inline">
+                   <button type="button" class="btn btn-info nextpage" >다음</button>
+                 </div>
+           <%  } else if (Isfirstpage == true){  %>
+
+                    <div >
+                      <button type="button" class="btn btn-info nextpage">다음</button>
+                    </div>
+            <% } %>
+
+
+
+
+
+
+
+        </div> <!-- class="container" 끝 -->
+
+
+        <style type="text/css">
+/* 이위치도가능? 응 가능 ! ^^ */
+
+body {
+  background-color: #F0FFF0;
+  margin:10px 0px 10px;
+}
+
+        </style>
+        <script type="text/javascript">
+
+          window.onload=function(){
+
+            $('#submit').click(function(){
+              $('#result').submit();
+              console.log("javascript - submit 클릭");
+            })
+
+            $('.previouspage').click(function(){
+              console.log("javascript - previouspage 클릭");
+              window.location='http://172.30.1.13:8887/survey/<%=form_id%>/<%=PresectionIndex%>';
+            })
+
+            $('.nextpage').click(function(){
+              console.log("javascript - nextpage 클릭");
+              window.location='http://172.30.1.13:8887/survey/<%=form_id%>/<%=CursectionIndex%>';
+            })
+
+        }
+
+        // $( document ).ready(function() {
+        //   console.log( "ready 가" );
+        // });
+
+
+        // $(function() { // work
+        //   console.log( "ready 나" );
+        // });
+
+
+
+
+        </script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <!-- Popper.JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+        <!-- Bootstrap JS -->
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+        <!-- jquery-->
+        <!--<script src="//code.jquery.com/jquery.min.js"></script>-->
+
+        <!-- datapicker-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.ko.min.js"></script>
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"></script> -->
+    </body>
+
+</html>

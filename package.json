@@ -1,0 +1,22 @@
+{
+  "name": "checkmate_server",
+  "version": "1.0.0",
+  "description": "feature",
+  "main": "web.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jeongjiseung",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.3",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "fs-extra": "^9.0.0",
+    "mkdirp": "^1.0.4",
+    "multiparty": "^4.2.1",
+    "mysql": "^2.18.1",
+    "path": "^0.12.7",
+    "socket.io": "^2.3.0"
+  }
+}
